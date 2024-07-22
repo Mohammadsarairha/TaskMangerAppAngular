@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable } from 'rxjs';
 import { User } from '../_models/user';
 
 @Injectable({
@@ -14,20 +14,38 @@ export class AccountService {
 
   constructor(private http: HttpClient) { }
 
-  login(model: User) {
-    return this.http.post<User>(this.baseUrl + 'auth/login', model).pipe(
+  login(model: any): Observable<any> {
+    return this.http.post<User>(`${this.baseUrl}auth/login`, model).pipe(
       map((response: User) => {
-        const user = response;
-        if(user){
-          localStorage.setItem('user' , JSON.stringify(user));
-          this.currentUserSource.next(user);
+        if (response) {
+          localStorage.setItem('user', JSON.stringify(response));
+          this.currentUserSource.next(response);
+          return { success: true, message: 'Login successful!', user: response };
         }
+        return { success: false, message: 'Unknown error occurred' };
+      }),
+      catchError(error => {
+        return [{ success: false, message: error.error.message || 'Login failed' }];
       })
     );
   }
 
   setCurrentUSer(user: User){
     this.currentUserSource.next(user);
+  }
+
+  register(model: any):Observable<any>{
+    return this.http.post<any>(this.baseUrl + 'auth/Register' , model).pipe(
+      map((response : any )=> {
+        if(response){
+          return { success: true, message: 'Register successful!', user:response };
+        }
+        return { success: false, message: 'Unknown error occurred' };
+      }),
+      catchError(error => {
+        return [{ success: false, message: error.error.message || 'Login failed' }];
+      })
+    );
   }
 
   logout(){

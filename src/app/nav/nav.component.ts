@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService } from '../_services/account.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { User } from '../_models/user';
 
 @Component({
   selector: 'app-nav',
@@ -9,31 +12,36 @@ import { AccountService } from '../_services/account.service';
 export class NavComponent implements OnInit {
 
   model: any = {};
-  loggedIn = false;
-  constructor(private accountService: AccountService) { }
+  userName: string = "";
+  constructor(public accountService: AccountService ,
+              private snackBar: MatSnackBar ,
+              private router: Router) { }
 
   ngOnInit(): void {
-    this.getCurrentUser();
-  }
-
-  getCurrentUser() {
-    this.accountService.currentUser$.subscribe({
-      next: user => this.loggedIn = !!user,
-      error: error => console.log(error)
-    })
+    const userString = localStorage.getItem('user');
+    if (!userString) return;
+    const user: User = JSON.parse(userString);
+    this.userName = user.username;
   }
 
   login() {
     this.accountService.login(this.model).subscribe({
       next: (response: any) => {
-        this.loggedIn = true;
+        this.userName = response.user.username.toUpperCase();
+        this.snackBar.open(response.message, 'Close', { duration: 3000 });
+        this.router.navigateByUrl('/project')
       },
-      error: error => console.log(error)
+      error: error => {
+        this.snackBar.open('An error occurred. Please try again.', 'Close', { duration: 3000 });
+      }
     });
   }
-
+  
   logout(){
     this.accountService.logout();
-    this.loggedIn = false;
+    this.router.navigateByUrl('/');
+    // Reset the form fields
+    this.model.userName = '';
+    this.model.password = '';
   }
 }

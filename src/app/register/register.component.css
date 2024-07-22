@@ -1,0 +1,15 @@
+/* Styling for the container holding the form */
+.form-container {
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1); /* Adding a subtle shadow */
+    transform: translateZ(0); /* Ensures GPU acceleration for smoother animation */
+    transition: transform 0.3s ease-in-out; /* Smooth transition effect */
+}
+
+/* Adding 3D effect on hover */
+.form-container:hover {
+    transform: scale(1.02); /* Slightly scale up on hover */
+}

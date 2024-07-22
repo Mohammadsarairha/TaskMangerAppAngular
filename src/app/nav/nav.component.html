@@ -1,25 +1,25 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <div class="container">
-      <a class="navbar-brand">Task Manager</a>
-
-        <ul class="navbar-nav me-auto mb-2 mb-md-0" *ngIf="loggedIn">
-          <li class="nav-item">
-            <a class="nav-link">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link">Link</a>
-          </li>
-        </ul>
-
-        <div class="dropdown" *ngIf="loggedIn" dropdown>
-          <a class="dropdown-toggle text-light text-decoration-none" dropdownToggle>Welcome User</a>
+      <a class="navbar-brand" routerLink="/" routerLinkActive="active">Task Manager</a>
+        <ng-container *ngIf="(accountService.currentUser$ | async)">
+          <ul class="navbar-nav me-auto mb-2 mb-md-0">
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/project" routerLinkActive="active">Projects</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/projectTasks" routerLinkActive="active">ProjectTasks</a>
+            </li>
+          </ul>
+        </ng-container>
+        <div class="dropdown" *ngIf="accountService.currentUser$ | async" dropdown>
+          <a class="dropdown-toggle text-light text-decoration-none" dropdownToggle>Welcome {{userName}}</a>
           <div class="dropdown-menu mt-3" *dropdownMenu>
               <a class="dropdown-item">Edit Profile</a>
               <a class="dropdown-item" (click)="logout()">Logout</a>
           </div>
         </div>
 
-        <form *ngIf="!loggedIn" #loginForm="ngForm" class="d-flex" (ngSubmit)="login()" autocomplete="off"> 
+        <form *ngIf="!(accountService.currentUser$ | async)" #loginForm="ngForm" class="d-flex" (ngSubmit)="login()" autocomplete="off"> 
           <input 
             name="userName" 
             [(ngModel)]="model.userName" 
@@ -33,6 +33,7 @@
             type="password"
             placeholder="Password">
           <button class="btn btn-outline-success" type="submit">Login</button>
+          <button class="btn btn-outline-success ms-2" type="button" routerLink="/register">Signup</button>
         </form>
     </div>
   </nav>
